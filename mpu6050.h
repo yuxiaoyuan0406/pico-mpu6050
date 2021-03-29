@@ -13,10 +13,26 @@ static const int default_addr = 0x68;
 
 class mpu6050
 {
+public:
+    enum gyro_full_scale_sel {
+        gyro_250_degrees = 0,
+        gyro_500_degrees = 1,
+        gyro_1000_degrees = 2,
+        gyro_2000_degrees = 3,
+    };
+    enum accel_full_scale_sel {
+        accel_2g = 0,
+        accel_4g = 1,
+        accel_8g = 2,
+        accel_16g = 3,
+    };
+
 private:
     i2c_inst_t *_i2c_port;
     uint _sda_pin, _scl_pin, _baudrate;
     int _addr;
+    gyro_full_scale_sel _gyro_full_scale;
+    accel_full_scale_sel _accel_full_scale;
     void _reset();
 
     /*! \brief Attempt to write specified number of bytes to this->_addr, blocking
@@ -59,4 +75,13 @@ public:
     * \param temp Temperature buffer. Will not read if NULL.
     */
     void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
+
+    /*! \brief  Select the full scale range of the gyroscope outputs.
+    * \param sel full scale selection, enum
+    */
+    void set_gyro_full_scale(gyro_full_scale_sel sel);
+    /*! \brief  Select the full scale range of the accelerometer outputs.
+    * \param sel full scale selection, enum
+    */
+    void set_accle_full_scale(accel_full_scale_sel sel);
 };
