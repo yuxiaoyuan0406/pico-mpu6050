@@ -6,7 +6,7 @@
 
 #if !defined(i2c_default) || !defined(PICO_DEFAULT_I2C_SDA_PIN) || !defined(PICO_DEFAULT_I2C_SCL_PIN)
 #warning The mpu6050 class requires a board with I2C pins. If not defined, please specified port, sda and scl pin when calling the constructor.
-#else
+#endif
 
 static const uint default_baudrate = 400 * 1000;
 static const int default_addr = 0x68;
@@ -60,5 +60,3 @@ public:
     */
     void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
 };
-
-#endif
