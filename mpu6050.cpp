@@ -57,22 +57,24 @@ void mpu6050::read_raw(int16_t *accel, int16_t *gyro, int16_t *temp)
         this->_write_blocking(&ACCEL_XOUT_H, 1, true);
         this->_read_blocking(buffer, 6, false);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++)
+        {
             *(accel + i) = (*(buffer + i * 2) << 8 | *(buffer + i * 2 + 1));
         }
     }
 
-    if(gyro != nullptr)
+    if (gyro != nullptr)
     {
         this->_write_blocking(&GYRO_XOUT_H, 1, true);
         this->_read_blocking(buffer, 6, false);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++)
+        {
             *(gyro + i) = (*(buffer + i * 2) << 8 | *(buffer + i * 2 + 1));
         }
     }
 
-    if(temp != nullptr)
+    if (temp != nullptr)
     {
         this->_write_blocking(&TEMP_OUT_H, 1, true);
         this->_read_blocking(buffer, 2, false);
@@ -93,20 +95,17 @@ inline void mpu6050::_write_register(uint8_t reg, uint8_t val)
     this->_write_blocking(&val, 1, false);
 }
 
-void mpu6050::_reset()
+inline void mpu6050::_reset()
 {
-    uint8_t buf[2] = {PWR_MGMT_1, 0x00};
-    this->_write_blocking(buf, 2, false);
+    this->_write_register(PWR_MGMT_1, 0x00);
 }
 
-void mpu6050::set_gyro_full_scale(mpu6050::gyro_full_scale_sel sel)
+inline void mpu6050::set_gyro_full_scale(mpu6050::gyro_full_scale_sel sel)
 {
-    uint8_t buf[2] = {GYRO_CONFIG, 0xFF & (sel << 3)};
-    this->_write_blocking(buf, 2, false);
+    this->_write_register(GYRO_CONFIG, 0xFF & (sel << 3));
 }
 
-void mpu6050::set_accle_full_scale(mpu6050::accel_full_scale_sel sel)
+inline void mpu6050::set_accle_full_scale(mpu6050::accel_full_scale_sel sel)
 {
-    uint8_t buf[2] = {ACCEL_CONFIG, 0xFF & (sel << 3)};
-    this->_write_blocking(buf, 2, false);
+    this->_write_register(ACCEL_CONFIG, 0xFF & (sel << 3));
 }
