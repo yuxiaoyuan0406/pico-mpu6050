@@ -48,8 +48,33 @@ void mpu6050::read_raw(int16_t *accel, int16_t *gyro, int16_t *temp)
 {
     uint8_t *buffer = new uint8_t[6];
 
-    this->_write_blocking(&ACCEL_XOUT_H, 1, true);
-    this->_read_blocking(buffer, 6, false);
+    if (accel != nullptr)
+    {
+        this->_write_blocking(&ACCEL_XOUT_H, 1, true);
+        this->_read_blocking(buffer, 6, false);
+
+        for (int i = 0; i < 3; i++) {
+            *(accel + i) = (*(buffer + i * 2) << 8 | *(buffer + i * 2 + 1));
+        }
+    }
+
+    if(gyro != nullptr)
+    {
+        this->_write_blocking(&GYRO_XOUT_H, 1, true);
+        this->_read_blocking(buffer, 6, false);
+
+        for (int i = 0; i < 3; i++) {
+            *(gyro + i) = (*(buffer + i * 2) << 8 | *(buffer + i * 2 + 1));
+        }
+    }
+
+    if(temp != nullptr)
+    {
+        this->_write_blocking(&TEMP_OUT_H, 1, true);
+        this->_read_blocking(buffer, 2, false);
+
+        *temp = *buffer << 8 | *(buffer + 1);
+    }
 
     delete[] buffer;
 }
