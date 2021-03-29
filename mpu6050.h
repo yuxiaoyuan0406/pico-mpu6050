@@ -43,8 +43,7 @@ private:
     *           and the next transfer will begin with a Restart rather than a Start.
     * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
     */
-    inline int _write_blocking(const uint8_t *src, size_t len, bool nostop) { return i2c_write_blocking(this->_i2c_port, this->_addr, src, len, nostop); }
-
+    int _write_blocking(const uint8_t *src, size_t len, bool nostop);
     /*! \brief  Attempt to read specified number of bytes from this->_addr, blocking
     *
     * \param dst Pointer to buffer to receive data
@@ -53,7 +52,13 @@ private:
     *           and the next transfer will begin with a Restart rather than a Start.
     * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
     */
-    inline int _read_blocking(uint8_t *dst, size_t len, bool nostop) { return i2c_read_blocking(this->_i2c_port, this->_addr, dst, len, nostop); }
+    int _read_blocking(uint8_t *dst, size_t len, bool nostop);
+
+    /*! \brief Write a single byte to a specified register
+    * \param reg the address of the register
+    * \param val the byte to write
+    */
+    void _write_register(uint8_t reg, uint8_t val);
 
 public:
     /*! \brief  Create a mpu6050 object on a specified i2c port. 
