@@ -44,6 +44,18 @@ mpu6050::~mpu6050()
 {
 }
 
+void mpu6050::read_raw(int16_t *accel, int16_t *gyro, int16_t *temp)
+{
+    uint8_t *buffer = new uint8_t[6];
+
+    // i2c_write_blocking(this->_i2c_port, this->_addr, &ACCEL_XOUT_H, 1, true);
+    i2c_read_blocking(this->_i2c_port, this->_addr, buffer, 6, false);
+    this->_write_blocking(&ACCEL_XOUT_H, 1, true);
+    this->_read_blocking(buffer, 6, false);
+
+    delete[] buffer;
+}
+
 void mpu6050::_reset()
 {
     uint8_t buf[2] = {PWR_MGMT_1, 0x00};
