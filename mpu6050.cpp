@@ -6,6 +6,10 @@
 /*  https://datasheetspdf.com/datasheet/MPU6050.html    */
 typedef const uint8_t mpu_reg_t;
 
+// Configurations
+mpu_reg_t GYRO_CONFIG = 0x1B;
+mpu_reg_t ACCEL_CONFIG = 0x1C;
+
 // Accelerometer Measurements
 mpu_reg_t ACCEL_XOUT_H = 0x3B;
 mpu_reg_t ACCEL_XOUT_L = 0x3C;
@@ -82,5 +86,17 @@ void mpu6050::read_raw(int16_t *accel, int16_t *gyro, int16_t *temp)
 void mpu6050::_reset()
 {
     uint8_t buf[2] = {PWR_MGMT_1, 0x00};
+    this->_write_blocking(buf, 2, false);
+}
+
+void mpu6050::set_gyro_full_scale(mpu6050::gyro_full_scale_sel sel)
+{
+    uint8_t buf[2] = {GYRO_CONFIG, 0xFF & (sel << 3)};
+    this->_write_blocking(buf, 2, false);
+}
+
+void mpu6050::set_accle_full_scale(mpu6050::accel_full_scale_sel sel)
+{
+    uint8_t buf[2] = {ACCEL_CONFIG, 0xFF & (sel << 3)};
     this->_write_blocking(buf, 2, false);
 }
