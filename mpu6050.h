@@ -53,6 +53,11 @@ public:
             int addr = default_addr,
             uint baudrate = default_baudrate);
     ~mpu6050();
+    /*! \brief  Read raw data from mpu.
+    * \param accel Acceleration buffer. Will not read if NULL.
+    * \param gyro Gyroscope buffer. Will not read if NULL.
+    * \param temp Temperature buffer. Will not read if NULL.
+    */
     void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
 };
 
