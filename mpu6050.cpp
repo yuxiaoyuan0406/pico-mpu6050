@@ -4,17 +4,39 @@
 /*          MPU-6050/MPU-6000 Register Map              */
 /*          Check datasheet for details.                */
 /*  https://datasheetspdf.com/datasheet/MPU6050.html    */
-static const uint8_t PWR_MGMT_1 = 0x6B;
+typedef const uint8_t mpu_reg_t;
 
-mpu6050::mpu6050(i2c_inst_t *i2c, uint sda, uint scl, int addr, uint baudrate):
-_i2c_port(i2c), _sda_pin(sda), _scl_pin(scl), _baudrate(baudrate), _addr(addr)
+// Accelerometer Measurements
+mpu_reg_t ACCEL_XOUT_H = 0x3B;
+mpu_reg_t ACCEL_XOUT_L = 0x3C;
+mpu_reg_t ACCEL_YOUT_H = 0x3D;
+mpu_reg_t ACCEL_YOUT_L = 0x3E;
+mpu_reg_t ACCEL_ZOUT_H = 0x3F;
+mpu_reg_t ACCEL_ZOUT_L = 0x40;
+// Temperature Measurement
+mpu_reg_t TEMP_OUT_H = 0x41;
+mpu_reg_t TEMP_OUT_L = 0x42;
+// Gyroscope Measurements
+mpu_reg_t GYRO_XOUT_H = 0x43;
+mpu_reg_t GYRO_XOUT_L = 0x44;
+mpu_reg_t GYRO_YOUT_H = 0x45;
+mpu_reg_t GYRO_YOUT_L = 0x46;
+mpu_reg_t GYRO_ZOUT_H = 0x47;
+mpu_reg_t GYRO_ZOUT_L = 0x48;
+
+// Power Management
+mpu_reg_t PWR_MGMT_1 = 0x6B;
+
+mpu6050::mpu6050(i2c_inst_t *i2c, uint sda, uint scl, int addr, uint baudrate) : _i2c_port(i2c), _sda_pin(sda), _scl_pin(scl), _baudrate(baudrate), _addr(addr)
 {
-    i2c_init(this->_i2c_port, this->_baudrate);
-    gpio_set_function(this->_sda_pin, GPIO_FUNC_I2C);
-    gpio_set_function(this->_scl_pin, GPIO_FUNC_I2C);
-    gpio_pull_up(this->_sda_pin);
-    gpio_pull_up(this->_scl_pin);
-
+    if (this->_i2c_port->hw->enable == 0)
+    {
+        i2c_init(this->_i2c_port, this->_baudrate);
+        gpio_set_function(this->_sda_pin, GPIO_FUNC_I2C);
+        gpio_set_function(this->_scl_pin, GPIO_FUNC_I2C);
+        gpio_pull_up(this->_sda_pin);
+        gpio_pull_up(this->_scl_pin);
+    }
     this->_reset();
 }
 
