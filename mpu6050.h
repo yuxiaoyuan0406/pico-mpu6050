@@ -5,7 +5,7 @@
 #include "pico/types.h"
 
 #if !defined(i2c_default) || !defined(PICO_DEFAULT_I2C_SDA_PIN) || !defined(PICO_DEFAULT_I2C_SCL_PIN)
-    #warning The mpu6050 class requires a board with I2C pins. If not defined, please specified port, sda and scl pin when calling the constructor. 
+#warning The mpu6050 class requires a board with I2C pins. If not defined, please specified port, sda and scl pin when calling the constructor.
 #else
 
 static const uint default_baudrate = 400 * 1000;
@@ -29,20 +29,28 @@ private:
     */
     inline int _write_blocking(const uint8_t *src, size_t len, bool nostop) { return i2c_write_blocking(this->_i2c_port, this->_addr, src, len, nostop); }
 
-/*! \brief  Attempt to read specified number of bytes from this->_addr, blocking
- *
- * \param dst Pointer to buffer to receive data
- * \param len Length of data in bytes to receive
- * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
- *           and the next transfer will begin with a Restart rather than a Start.
- * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
- */
-    inline int _read_blocking(uint8_t *dst, size_t len, bool nostop) { i2c_read_blocking(this->_i2c_port, this->_addr, dst, len, nostop); }
+    /*! \brief  Attempt to read specified number of bytes from this->_addr, blocking
+    *
+    * \param dst Pointer to buffer to receive data
+    * \param len Length of data in bytes to receive
+    * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+    *           and the next transfer will begin with a Restart rather than a Start.
+    * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
+    */
+    inline int _read_blocking(uint8_t *dst, size_t len, bool nostop) { return i2c_read_blocking(this->_i2c_port, this->_addr, dst, len, nostop); }
+
 public:
+    /*! \brief  Create a mpu6050 object on a specified i2c port. 
+    * \param i2c I2C port which mpu connected to. default = i2c_default
+    * \param sda GPIO number to sda. default = PICO_DEFAULT_I2C_SDA_PIN
+    * \param scl GPIO number to scl. default = PICO_DEFAULT_I2C_SCL_PIN
+    * \param addr Address of mpu. default = 0x68
+    * \param baudrate I2C baudrate. default = 400*1000
+    */
     mpu6050(i2c_inst_t *i2c = i2c_default,
             uint sda = PICO_DEFAULT_I2C_SDA_PIN,
             uint scl = PICO_DEFAULT_I2C_SCL_PIN,
-            int addr = default_addr, 
+            int addr = default_addr,
             uint baudrate = default_baudrate);
     ~mpu6050();
     void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
