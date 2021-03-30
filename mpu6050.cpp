@@ -1,4 +1,9 @@
+#include "../defines.h"
 #include "mpu6050.h"
+
+#ifdef _DEBUG
+#include <stdio.h>
+#endif // _DEBUG
 
 /********************************************************/
 /*          MPU-6050/MPU-6000 Register Map              */
@@ -29,18 +34,30 @@ mpu_reg_t GYRO_ZOUT_H = 0x47;
 mpu_reg_t GYRO_ZOUT_L = 0x48;
 
 // Power Management
+mpu_reg_t USER_CTRL  = 0x6A;
 mpu_reg_t PWR_MGMT_1 = 0x6B;
+mpu_reg_t PWR_MGMT_2 = 0x6C;
 
-mpu6050::mpu6050(i2c_inst_t *i2c, uint sda, uint scl, int addr, uint baudrate) : _i2c_port(i2c), _sda_pin(sda), _scl_pin(scl), _baudrate(baudrate), _addr(addr)
+mpu6050::mpu6050(i2c_inst_t *i2c, uint sda, uint scl, int addr, uint baudrate) : _i2c_port(i2c), _sda_pin(sda), _scl_pin(scl), _baudrate(baudrate), _addr(addr), _accel_full_scale(accel_2g), _gyro_full_scale(gyro_250_degrees)
 {
     if (this->_i2c_port->hw->enable == 0)
     {
+#ifdef _DEBUG
+        printf("I2C port initializing...\r\n");
+#endif // _DEBUG
         i2c_init(this->_i2c_port, this->_baudrate);
         gpio_set_function(this->_sda_pin, GPIO_FUNC_I2C);
         gpio_set_function(this->_scl_pin, GPIO_FUNC_I2C);
         gpio_pull_up(this->_sda_pin);
         gpio_pull_up(this->_scl_pin);
     }
+#ifdef _DEBUG
+    else
+    {
+        printf("I2C port already initialized.\r\n");
+    }
+#endif // _DEBUG
+
     this->_reset();
 }
 
@@ -91,21 +108,39 @@ inline int mpu6050::_read_blocking(uint8_t *dst, size_t len, bool nostop) { retu
 
 inline void mpu6050::_write_register(uint8_t reg, uint8_t val)
 {
-    this->_write_blocking(&reg, 1, true);
-    this->_write_blocking(&val, 1, false);
+#ifdef _DEBUG
+    printf("Writing register 0x%02X value 0x%02X\r\n", reg, val);
+#endif // _DEBUG
+    uint8_t msg[2] = {reg, val};
+    // this->_write_blocking(&reg, 1, true);
+    // this->_write_blocking(&val, 1, false);
+    this->_write_blocking(msg, 2, false);
 }
 
 inline void mpu6050::_reset()
 {
-    this->_write_register(PWR_MGMT_1, 0x00);
+    this->_write_register(PWR_MGMT_1, 0x01);
+    this->_write_register(PWR_MGMT_2, 0x00);
 }
 
-inline void mpu6050::set_gyro_full_scale(mpu6050::gyro_full_scale_sel sel)
+void mpu6050::set_gyro_full_scale(gyro_full_scale_sel sel)
 {
-    this->_write_register(GYRO_CONFIG, 0xFF & (sel << 3));
+    this->_gyro_full_scale = sel;
+    uint8_t val = 0xFF & (sel << 3);
+#ifdef _DEBUG
+    printf("Gyro config. 0x%02X\r\n", val);
+#endif // _DEBUG
+    this->_write_register(GYRO_CONFIG, val);
+    this->_reset();
 }
 
-inline void mpu6050::set_accle_full_scale(mpu6050::accel_full_scale_sel sel)
+void mpu6050::set_accel_full_scale(accel_full_scale_sel sel)
 {
-    this->_write_register(ACCEL_CONFIG, 0xFF & (sel << 3));
+    this->_accel_full_scale = sel;
+    uint8_t val = 0xFF & (sel << 3);
+#ifdef _DEBUG
+    printf("Accel config. 0x%02X\r\n", val);
+#endif // _DEBUG
+    this->_write_register(ACCEL_CONFIG, val);
+    this->_reset();
 }

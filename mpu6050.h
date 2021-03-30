@@ -14,18 +14,49 @@ static const int default_addr = 0x68;
 class mpu6050
 {
 public:
-    enum gyro_full_scale_sel {
+    enum gyro_full_scale_sel
+    {
         gyro_250_degrees = 0,
         gyro_500_degrees = 1,
         gyro_1000_degrees = 2,
         gyro_2000_degrees = 3,
     };
-    enum accel_full_scale_sel {
+    enum accel_full_scale_sel
+    {
         accel_2g = 0,
         accel_4g = 1,
         accel_8g = 2,
         accel_16g = 3,
     };
+
+    /*! \brief  Create a mpu6050 object on a specified i2c port. 
+    * \param i2c I2C port which mpu connected to. default = i2c_default
+    * \param sda GPIO number to sda. default = PICO_DEFAULT_I2C_SDA_PIN
+    * \param scl GPIO number to scl. default = PICO_DEFAULT_I2C_SCL_PIN
+    * \param addr Address of mpu. default = 0x68
+    * \param baudrate I2C baudrate. default = 400*1000
+    */
+    mpu6050(i2c_inst_t *i2c = i2c_default,
+            uint sda = PICO_DEFAULT_I2C_SDA_PIN,
+            uint scl = PICO_DEFAULT_I2C_SCL_PIN,
+            int addr = default_addr,
+            uint baudrate = default_baudrate);
+    ~mpu6050();
+    /*! \brief  Read raw data from mpu.
+    * \param accel Acceleration buffer. Will not read if NULL.
+    * \param gyro Gyroscope buffer. Will not read if NULL.
+    * \param temp Temperature buffer. Will not read if NULL.
+    */
+    void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
+
+    /*! \brief  Select the full scale range of the gyroscope outputs.
+    * \param sel full scale selection, enum
+    */
+    void set_gyro_full_scale(gyro_full_scale_sel sel);
+    /*! \brief  Select the full scale range of the accelerometer outputs.
+    * \param sel full scale selection, enum
+    */
+    void set_accel_full_scale(accel_full_scale_sel sel);
 
 private:
     i2c_inst_t *_i2c_port;
@@ -59,34 +90,4 @@ private:
     * \param val the byte to write
     */
     void _write_register(uint8_t reg, uint8_t val);
-
-public:
-    /*! \brief  Create a mpu6050 object on a specified i2c port. 
-    * \param i2c I2C port which mpu connected to. default = i2c_default
-    * \param sda GPIO number to sda. default = PICO_DEFAULT_I2C_SDA_PIN
-    * \param scl GPIO number to scl. default = PICO_DEFAULT_I2C_SCL_PIN
-    * \param addr Address of mpu. default = 0x68
-    * \param baudrate I2C baudrate. default = 400*1000
-    */
-    mpu6050(i2c_inst_t *i2c = i2c_default,
-            uint sda = PICO_DEFAULT_I2C_SDA_PIN,
-            uint scl = PICO_DEFAULT_I2C_SCL_PIN,
-            int addr = default_addr,
-            uint baudrate = default_baudrate);
-    ~mpu6050();
-    /*! \brief  Read raw data from mpu.
-    * \param accel Acceleration buffer. Will not read if NULL.
-    * \param gyro Gyroscope buffer. Will not read if NULL.
-    * \param temp Temperature buffer. Will not read if NULL.
-    */
-    void read_raw(int16_t *accel, int16_t *gyro, int16_t *temp);
-
-    /*! \brief  Select the full scale range of the gyroscope outputs.
-    * \param sel full scale selection, enum
-    */
-    void set_gyro_full_scale(gyro_full_scale_sel sel);
-    /*! \brief  Select the full scale range of the accelerometer outputs.
-    * \param sel full scale selection, enum
-    */
-    void set_accle_full_scale(accel_full_scale_sel sel);
 };
