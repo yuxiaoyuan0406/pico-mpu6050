@@ -1,4 +1,3 @@
-#include "../defines.h"
 #include "mpu6050.h"
 
 #ifdef _DEBUG
