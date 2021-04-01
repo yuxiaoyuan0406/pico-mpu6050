@@ -33,7 +33,7 @@ mpu_reg_t GYRO_ZOUT_H = 0x47;
 mpu_reg_t GYRO_ZOUT_L = 0x48;
 
 // Power Management
-mpu_reg_t USER_CTRL  = 0x6A;
+mpu_reg_t USER_CTRL = 0x6A;
 mpu_reg_t PWR_MGMT_1 = 0x6B;
 mpu_reg_t PWR_MGMT_2 = 0x6C;
 
@@ -56,6 +56,8 @@ mpu6050::mpu6050(i2c_inst_t *i2c, uint sda, uint scl, int addr, uint baudrate) :
         printf("I2C port already initialized.\r\n");
     }
 #endif // _DEBUG
+    this->set_gyro_full_scale(this->_gyro_full_scale);
+    this->set_accel_full_scale(this->_accel_full_scale);
 
     this->_reset();
 }
@@ -102,8 +104,10 @@ void mpu6050::read_raw(int16_t *accel, int16_t *gyro, int16_t *temp)
 }
 
 inline int mpu6050::_write_blocking(const uint8_t *src, size_t len, bool nostop) { return i2c_write_blocking(this->_i2c_port, this->_addr, src, len, nostop); }
+int mpu6050::write_blocking(const uint8_t *scr, size_t len, bool nostop) { return this->_write_blocking(scr, len, nostop); }
 
 inline int mpu6050::_read_blocking(uint8_t *dst, size_t len, bool nostop) { return i2c_read_blocking(this->_i2c_port, this->_addr, dst, len, nostop); }
+int mpu6050::read_blocking(uint8_t *dst, size_t len, bool nostop) { return this->_read_blocking(dst, len, nostop); }
 
 inline void mpu6050::_write_register(uint8_t reg, uint8_t val)
 {

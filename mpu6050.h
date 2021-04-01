@@ -58,6 +58,25 @@ public:
     */
     void set_accel_full_scale(accel_full_scale_sel sel);
 
+    /*! \brief Attempt to write specified number of bytes to the address of the mpu, blocking
+    *
+    * \param src Pointer to data to send
+    * \param len Length of data in bytes to send
+    * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+    *           and the next transfer will begin with a Restart rather than a Start.
+    * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
+    */
+    int write_blocking(const uint8_t *scr, size_t len, bool nostop);
+    /*! \brief  Attempt to read specified number of bytes from the address of the mpu, blocking
+    *
+    * \param dst Pointer to buffer to receive data
+    * \param len Length of data in bytes to receive
+    * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+    *           and the next transfer will begin with a Restart rather than a Start.
+    * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
+    */
+    int read_blocking(uint8_t *dst, size_t len, bool nostop);
+
 private:
     i2c_inst_t *_i2c_port;
     uint _sda_pin, _scl_pin, _baudrate;
